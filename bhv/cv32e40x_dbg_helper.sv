@@ -36,7 +36,7 @@ module cv32e40x_dbg_helper
     input                                    rf_addr_t rf_waddr,
     input logic                              illegal_insn);
   
-  
+  /* verilator lint_off UNPACKED */
   typedef struct {
     logic [31:0] instr;
     logic        is_compressed;
@@ -47,7 +47,7 @@ module cv32e40x_dbg_helper
     rf_addr_t    rf_waddr;
     logic        illegal_insn;
   } dbg_help_t;
-  
+  /* verilator lint_on UNPACKED */
   dbg_help_t dbg_help;
 
   assign dbg_help.instr         = instr;
