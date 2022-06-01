@@ -60,20 +60,13 @@ module coproc import custom_instr_pkg::*;
     (
      .clk_i (clk_i),
      .rst_ni (rst_ni),
-     .issue_valid_i (xif_issue.issue_valid),
-     .rs1_i (xif_issue.issue_req.rs[0]),
-     .rs2_i (xif_issue.issue_req.rs[1]),
-     .opcode_i (xif_issue.issue_req.instr[6:0]),
      .rd_o (rd_DI),
-     .accept_instr_o (xif_issue.issue_resp.accept),
-     .issue_ready_o (xif_issue.issue_ready)
+     .xif_issue (xif_issue)
      );
   
   
   // next_state logic
   always_comb begin
-    issue_ready_n = 1'b0;
-    issue_accept_n = 1'b0;
     state_SN = state_SP;
 
     unique case (state_SP)
@@ -93,11 +86,7 @@ module coproc import custom_instr_pkg::*;
   always_ff @(posedge clk_i, negedge rst_ni) begin
     if (!rst_ni) begin
       state_SP <= EXECUTE;
-      issue_ready_p <= 1'b0;
-      issue_accept_p <= 1'b0;
     end else begin
-      issue_ready_p <= issue_ready_n;
-      issue_accept_p <= issue_accept_n;
       state_SP <= state_SN;
     end
   end
