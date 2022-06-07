@@ -10,11 +10,10 @@ module coproc import custom_instr_pkg::*;
    if_xif.coproc_result xif_result 
    );
 
-
-  logic                      issue_ready_n, issue_ready_p;
-  logic                      issue_accept_n, issue_accept_p;
-                      
+  enum   logic [1:0] {EXECUTE, WRITEBACK} state_SN, state_SP;
   
+  logic [31:0] rd_i;
+  logic [4:0]  rd_addr_i;
 
   assign xif_compressed.compressed_ready = 1'b0;
   assign xif_compressed.compressed_resp.accept = 1'b0;
@@ -22,7 +21,7 @@ module coproc import custom_instr_pkg::*;
 
   //assign xif_issue.issue_ready = issue_ready_p;
   //assign xif_issue.issue_resp.accept = issue_accept_p; //ready 1 and accept 0 to reject all offloaded instrucitons for now
-  assign xif_issue.issue_resp.writeback = 1'b0;
+  //assign xif_issue.issue_resp.writeback = 1'b0;
   assign xif_issue.issue_resp.dualwrite = 1'b0;
   assign xif_issue.issue_resp.dualread = 1'b0;
   assign xif_issue.issue_resp.loadstore = 1'b0;
@@ -40,43 +39,42 @@ module coproc import custom_instr_pkg::*;
   
   assign xif_mem.mem_valid = 1'b0;
 
-  assign xif_result.result_valid = 1'b0;
-
   assign xif_result.result.id = 0;
-  assign xif_result.result.data = 0;
-  assign xif_result.result.rd = 0;
+  assign xif_result.result.data = rd_i;
+  assign xif_result.result.rd = rd_addr_i;
   assign xif_result.result.we = 0;
   assign xif_result.result.ecsdata = 0;
   assign xif_result.result.ecswe = 0;
   assign xif_result.result.exc = 0;
   assign xif_result.result.exccode = 0;
-
-  enum                       logic [1:0] {EXECUTE, WRITEBACK} state_SN, state_SP;
-
-  logic                   [31:0]   rd_DI;
   
 
   custom_ex_stage custom_ex_stage_i
     (
      .clk_i (clk_i),
      .rst_ni (rst_ni),
-     .rd_o (rd_DI),
-     .xif_issue (xif_issue)
+     .rd_o (rd_i),
+     .xif_issue (xif_issue),
+     .rd_addr_o (rd_addr_i)
      );
   
   
   // next_state logic
   always_comb begin
     state_SN = state_SP;
+    xif_result.result_valid = 1'b0;
 
     unique case (state_SP)
       
       EXECUTE: begin
-        state_SN = WRITEBACK; // only one clk cycle exec
+        if (xif_issue.issue_ready) //exec stage is done
+          state_SN = WRITEBACK;
       end
 
       WRITEBACK: begin
-        
+        xif_result.result_valid = 1'b1;
+        if (xif_result.result_ready)
+          state_SN = EXECUTE;
       end
     endcase
       
@@ -87,7 +85,7 @@ module coproc import custom_instr_pkg::*;
     if (!rst_ni) begin
       state_SP <= EXECUTE;
     end else begin
-      state_SP <= state_SN;
+      state_SP <= state_SN;     
     end
   end
   
