@@ -46,40 +46,36 @@ module custom_ex_stage import custom_instr_pkg::*;
   logic [8:0] right_shift;
   
 
-  assign top_4_bit = 32'hF0000000;
-  assign top_3_bit = 32'he0000000;
-  assign top_2_bit = 32'hc0000000;
-
-  assign top_bits_set[0] = 32'hF0000000;
+  assign right_shift = 31 - rs1;
   
-
-  assign right_shift = 31-rs1;
-
-  genvar      i;
-  
+  integer     i;
   
   //exec  logic for cntb instruction
   always_comb begin
     rd_DN = rd_DP;
+    top_bits_set[0] = 32'hF0000000;
+
+    for (i = 0; i < 3; i = i + 1) begin
+      top_bits_set[i + 1] = top_bits_set[0] << (i + 1);
+    end
     
     if (issue_ready_SP == 0) begin
       if (rs0[rs1] == 1'b1) begin
         // count consecutive 1 bits
-    
-        
-        if ((rs0 & ((top_4_bit)>>right_shift)) == top_4_bit>>right_shift)
-          rd_DN = 31'd4;
-        else if ((rs0 & ((top_3_bit)>>right_shift)) == top_3_bit>>right_shift)
-          rd_DN = 31'd3;
-        else if ((rs0 & ((top_2_bit)>>right_shift)) == top_2_bit>>right_shift)
-          rd_DN = 31'd2;
+        if ((rs0 & ((top_bits_set[0])>>right_shift)) == top_bits_set[0]>>right_shift)
+          rd_DN = 32'd4;
         else
-          rd_DN = 31'd1;
-      end else begin
-        rd_DN = 0;
-      end
+        if ((rs0 & ((top_bits_set[1])>>right_shift)) == top_bits_set[1]>>right_shift)
+          rd_DN = 32'd3;
+        else
+        if ((rs0 & ((top_bits_set[2])>>right_shift)) == top_bits_set[2]>>right_shift)
+          rd_DN = 32'd2;
+        else
+          rd_DN = 32'd1;    
+      end else if (rs0[rs1] == 1'b0) begin // if (rs0[rs1] == 1'b1)
+        
     end
-    
+
   end
   
 
