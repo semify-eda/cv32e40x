@@ -72,8 +72,9 @@ ${DESIGN_RTL_DIR}/cv32e40x_core.sv
 ${DESIGN_RTL_DIR}/cv32e40x_mpu.sv
 ${DESIGN_RTL_DIR}/cv32e40x_pma.sv
 ${DESIGN_RTL_DIR}/cv32e40x_pc_target.sv
-${DESIGN_RTL_DIR}/count_bits.sv  
-${DESIGN_RTL_DIR}/custom_ex_stage.sv
+${DESIGN_RTL_DIR}/count_bits.sv 
+${DESIGN_RTL_DIR}/cntb.sv
+${DESIGN_RTL_DIR}/wbits.sv
 ${DESIGN_RTL_DIR}/coproc.sv
   
 
