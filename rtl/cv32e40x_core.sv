@@ -54,79 +54,83 @@ module cv32e40x_core import cv32e40x_pkg::*;
 )
 (
   // Clock and reset
-  input  logic                          clk_i,
-  input  logic                          rst_ni,
-  input  logic                          scan_cg_en_i,   // Enable all clock gates for testing
+  input logic                          clk_i,
+  input logic                          rst_ni,
+  input logic                          scan_cg_en_i, // Enable all clock gates for testing
 
   // Static configuration
-  input  logic [31:0]                   boot_addr_i,
-  input  logic [31:0]                   dm_exception_addr_i,
-  input  logic [31:0]                   dm_halt_addr_i,
-  input  logic [31:0]                   mhartid_i,
-  input  logic  [3:0]                   mimpid_patch_i,
-  input  logic [31:0]                   mtvec_addr_i,
+  input logic [31:0]                   boot_addr_i,
+  input logic [31:0]                   dm_exception_addr_i,
+  input logic [31:0]                   dm_halt_addr_i,
+  input logic [31:0]                   mhartid_i,
+  input logic [3:0]                    mimpid_patch_i,
+  input logic [31:0]                   mtvec_addr_i,
 
   // Instruction memory interface
-  output logic                          instr_req_o,
-  input  logic                          instr_gnt_i,
-  input  logic                          instr_rvalid_i,
-  output logic [31:0]                   instr_addr_o,
-  output logic [1:0]                    instr_memtype_o,
-  output logic [2:0]                    instr_prot_o,
-  output logic                          instr_dbg_o,
-  input  logic [31:0]                   instr_rdata_i,
-  input  logic                          instr_err_i,
+  output logic                         instr_req_o,
+  input logic                          instr_gnt_i,
+  input logic                          instr_rvalid_i,
+  output logic [31:0]                  instr_addr_o,
+  output logic [1:0]                   instr_memtype_o,
+  output logic [2:0]                   instr_prot_o,
+  output logic                         instr_dbg_o,
+  input logic [31:0]                   instr_rdata_i,
+  input logic                          instr_err_i,
 
   // Data memory interface
-  output logic                          data_req_o,
-  input  logic                          data_gnt_i,
-  input  logic                          data_rvalid_i,
-  output logic [31:0]                   data_addr_o,
-  output logic [3:0]                    data_be_o,
-  output logic                          data_we_o,
-  output logic [31:0]                   data_wdata_o,
-  output logic [1:0]                    data_memtype_o,
-  output logic [2:0]                    data_prot_o,
-  output logic                          data_dbg_o,
-  output logic [5:0]                    data_atop_o,
-  input  logic [31:0]                   data_rdata_i,
-  input  logic                          data_err_i,
-  input  logic                          data_exokay_i,
+  output logic                         data_req_o,
+  input logic                          data_gnt_i,
+  input logic                          data_rvalid_i,
+  output logic [31:0]                  data_addr_o,
+  output logic [3:0]                   data_be_o,
+  output logic                         data_we_o,
+  output logic [31:0]                  data_wdata_o,
+  output logic [1:0]                   data_memtype_o,
+  output logic [2:0]                   data_prot_o,
+  output logic                         data_dbg_o,
+  output logic [5:0]                   data_atop_o,
+  input logic [31:0]                   data_rdata_i,
+  input logic                          data_err_i,
+  input logic                          data_exokay_i,
 
   // Cycle count
-  output logic [63:0]                   mcycle_o,
-
-  // eXtension interface
-  if_xif.cpu_compressed                 xif_compressed_if,
-  if_xif.cpu_issue                      xif_issue_if,
-  if_xif.cpu_commit                     xif_commit_if,
-  if_xif.cpu_mem                        xif_mem_if,
-  if_xif.cpu_mem_result                 xif_mem_result_if,
-  if_xif.cpu_result                     xif_result_if,
+  output logic [63:0]                  mcycle_o,
+                                       
+                                       // eXtension interface
+                                       if_xif.cpu_compressed xif_compressed_if,
+                                       if_xif.cpu_issue xif_issue_if,
+                                       if_xif.cpu_commit xif_commit_if,
+                                       if_xif.cpu_mem xif_mem_if,
+                                       if_xif.cpu_mem_result xif_mem_result_if,
+                                       if_xif.cpu_result xif_result_if,
 
   // Basic interrupt architecture
-  input  logic [31:0]                   irq_i,
+  input logic [31:0]                   irq_i,
 
   // Smclic interrupt architecture
-  input  logic                          clic_irq_i,
-  input  logic [SMCLIC_ID_WIDTH-1:0]    clic_irq_id_i,
-  input  logic [ 7:0]                   clic_irq_level_i,
-  input  logic [ 1:0]                   clic_irq_priv_i,
-  input  logic                          clic_irq_shv_i,
+  input logic                          clic_irq_i,
+  input logic [SMCLIC_ID_WIDTH-1:0]    clic_irq_id_i,
+  input logic [ 7:0]                   clic_irq_level_i,
+  input logic [ 1:0]                   clic_irq_priv_i,
+  input logic                          clic_irq_shv_i,
 
   // Fence.i flush handshake
-  output logic                          fencei_flush_req_o,
-  input  logic                          fencei_flush_ack_i,
+  output logic                         fencei_flush_req_o,
+  input logic                          fencei_flush_ack_i,
 
   // Debug interface
-  input  logic                          debug_req_i,
-  output logic                          debug_havereset_o,
-  output logic                          debug_running_o,
-  output logic                          debug_halted_o,
+  input logic                          debug_req_i,
+  output logic                         debug_havereset_o,
+  output logic                         debug_running_o,
+  output logic                         debug_halted_o,
 
   // CPU control signals
-  input  logic                          fetch_enable_i,
-  output logic                          core_sleep_o
+  input logic                          fetch_enable_i,
+  output logic                         core_sleep_o,
+
+ //
+  output logic [SIGNALS_WIDTH - 1 : 0] signals_csr_o,
+  output logic [SAMPLES_WIDTH - 1 : 0] samples_csr_o
 );
 
   // Number of register file read ports
@@ -729,7 +733,11 @@ module cv32e40x_core import cv32e40x_pkg::*;
     .trigger_match_o            ( trigger_match_if       ),
 
     .pc_if_i                    ( pc_if                  ),
-    .ptr_in_if_i                ( ptr_in_if              )
+    .ptr_in_if_i                ( ptr_in_if              ),
+
+   // custom csrs
+   .samples_csr_o (samples_csr_o),
+   .signals_csr_o (signals_csr_o)
   );
 
   ////////////////////////////////////////////////////////////////////

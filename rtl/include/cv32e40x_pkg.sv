@@ -197,7 +197,10 @@ typedef enum logic [1:0] {DIV_IDLE, DIV_DIVIDE, DIV_DUMMY, DIV_FINISH} div_state
 //   \____|____/  |_| \_\___|\__, |_|___/\__\___|_|    //
 //                           |___/                     //
 /////////////////////////////////////////////////////////
-
+  
+parameter  SAMPLES_WIDTH = 16;
+parameter  SIGNALS_WIDTH = 8;
+ 
 // CSRs mnemonics
 typedef enum logic[11:0] {
 
@@ -211,7 +214,9 @@ typedef enum logic[11:0] {
   // User Custom CSRs
   ///////////////////////////////////////////////////////
 
-  // None
+  //CS registers for binary run length encoding
+  CSR_SIGNALS = 12'h018,
+  CSR_SAMPLES = 12'h019,
 
 
   ///////////////////////////////////////////////////////
@@ -422,6 +427,8 @@ typedef enum logic[11:0] {
   CSR_MIMPID         = 12'hF13,
   CSR_MHARTID        = 12'hF14,
   CSR_MCONFIGPTR     = 12'hF15
+
+                          
 } csr_num_e;
 
 // CSR operations

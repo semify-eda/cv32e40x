@@ -108,7 +108,11 @@ module cv32e40x_cs_registers import cv32e40x_pkg::*;
   output logic            trigger_match_o,
 
   input  logic [31:0]     pc_if_i,
-  input  logic            ptr_in_if_i
+  input  logic            ptr_in_if_i,
+
+ output logic [SIGNALS_WIDTH - 1 : 0] signals_csr_o,
+ output logic [SAMPLES_WIDTH - 1 : 0] samples_csr_o
+ 
 );
 
   localparam logic [31:0] CORE_MISA =
@@ -224,6 +228,16 @@ module cv32e40x_cs_registers import cv32e40x_pkg::*;
 
   logic illegal_csr_read;  // Current CSR cannot be read
   logic illegal_csr_write; // Current CSR cannot be written
+
+  logic [SAMPLES_WIDTH - 1:0] samples_q, samples_n;
+  logic [SIGNALS_WIDTH - 1:0] signals_q, signals_n;
+  logic        signals_we, signals_error_o;
+  logic        samples_we, samples_error_o;
+  
+  //custom csr
+  assign signals_csr_o = signals_q;
+  assign samples_csr_o = samples_q;
+  
 
   // Local instr_valid for write portion (WB)
   assign instr_valid = ex_wb_pipe_i.instr_valid && !ctrl_fsm_i.kill_wb && !ctrl_fsm_i.halt_wb;
@@ -528,6 +542,11 @@ module cv32e40x_cs_registers import cv32e40x_pkg::*;
       CSR_MHPMEVENT28, CSR_MHPMEVENT29, CSR_MHPMEVENT30, CSR_MHPMEVENT31:
         csr_rdata_int = mhpmevent_q[csr_raddr[4:0]];
 
+      CSR_SIGNALS: csr_rdata_int = signals_q;
+      CSR_SAMPLES: csr_rdata_int = samples_q;
+      
+        
+
 
       default: begin
         csr_rdata_int    = '0;
@@ -541,7 +560,12 @@ module cv32e40x_cs_registers import cv32e40x_pkg::*;
   // write logic
   always_comb
   begin
+    signals_n = csr_wdata_int;
+    samples_n = csr_wdata_int;
 
+    signals_we = 1'b0;
+    samples_we = 1'b0;
+    
     jvt_n                    = '0;
     jvt_we                   = 1'b0;
 
@@ -756,7 +780,13 @@ module cv32e40x_cs_registers import cv32e40x_pkg::*;
         CSR_DSCRATCH1: begin
                 dscratch1_we = 1'b1;
         end
-
+        CSR_SIGNALS: begin
+          signals_we = 1'b1;
+        end
+        CSR_SAMPLES: begin
+          samples_we = 1'b1;
+        end
+      
       endcase
     end
 
@@ -1018,6 +1048,33 @@ module cv32e40x_cs_registers import cv32e40x_pkg::*;
   assign mcause_o = mcause_q;
 
 
+   // csr register creation for Signals
+      cv32e40x_csr #(
+        .WIDTH      (SIGNALS_WIDTH),
+        .SHADOWCOPY (1'b0),
+        .RESETVALUE (32'd0)
+      ) signals_csr_i (
+        .clk      (clk),
+        .rst_n     (rst_n),
+        .wr_data_i  (signals_n),
+        .wr_en_i    (signals_we),
+        .rd_data_o  (signals_q),
+        .rd_error_o (signals_error_o)
+      );
+
+   // csr register creation for Samples
+      cv32e40x_csr #(
+        .WIDTH      (SAMPLES_WIDTH),
+        .SHADOWCOPY (1'b0),
+        .RESETVALUE (32'd0)
+      ) samples_csr_i (
+        .clk      (clk),
+        .rst_n     (rst_n),
+        .wr_data_i  (samples_n),
+        .wr_en_i    (samples_we),
+        .rd_data_o  (samples_q),
+        .rd_error_o (samples_error_o)
+                       );
 
   generate
     if (SMCLIC) begin : smclic_regs
@@ -1125,7 +1182,7 @@ module cv32e40x_cs_registers import cv32e40x_pkg::*;
         .rd_data_o  (mtvec_q),
         .rd_error_o (mtvec_rd_error)
       );
-      // Only include mie CSR when SMCLIC = 0
+     // Only include mie CSR when SMCLIC = 0
       cv32e40x_csr #(
         .WIDTH      (32),
         .SHADOWCOPY (1'b0),
