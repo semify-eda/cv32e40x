@@ -16,7 +16,7 @@ module cntb import custom_instr_pkg::*;
   
   logic [6:0] right_shift_DP, right_shift_DN;
   logic [31:0] result_cntb [7:0];
-  logic        cntb_done_SN, cntb_done_SP;
+  //logic        cntb_done_SN, cntb_done_SP;
   
 
   enum         logic [1:0]  {INIT, EXEC, DONE} state_SN, state_SP;

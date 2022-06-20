@@ -17,8 +17,7 @@ module coproc import custom_instr_pkg::*;
   enum   logic [2:0] {INIT, CNTB, WBITS, MEMORY, WRITEBACK,
                       READ_MEM, WRITE_MEM, WAIT_MEM_RESP} state_SN, state_SP;
   
-  logic [31:0] rd_i;
-  logic        mem_needed_i;
+  logic [31:0] rd_cntb_i, rd_wbits_i;
 
   logic        ld_op_SN, ld_op_SP;
 
@@ -37,9 +36,9 @@ module coproc import custom_instr_pkg::*;
   logic                 cntb_start_o, wbits_start_o;
 
   logic [3:0]           instr_id_DP, instr_id_DN;
-  logic                 mem_valid_SN, mem_valid_SP;
-  logic [31:0]          data_read_DN, data_read_DP;
-  
+
+  // r0 register is incresed by samples to read next signal bits
+  logic [31:0]          inc_addr_i;
   
   
 
@@ -62,10 +61,7 @@ module coproc import custom_instr_pkg::*;
   assign xif_mem.mem_req.we = 0;
   assign xif_mem.mem_req.be = 0;
   assign xif_mem.mem_req.wdata = 0;
-  assign xif_mem.mem_req.last = 0;
   assign xif_mem.mem_req.spec = 0;
-  
-  assign xif_mem.mem_valid = mem_valid_SP;
 
   assign xif_result.result.id = 0;
   assign xif_result.result.data = rd_DP;
@@ -83,7 +79,7 @@ module coproc import custom_instr_pkg::*;
     (
      .clk_i (clk_i),
      .rst_ni (rst_ni),
-     .rd_o (rd_i),
+     .rd_o (rd_cntb_i),
      .rs0_i (rs0_DP),
      .rs1_i (rs1_DP),
      .rd_i (rd_DP),
@@ -92,6 +88,8 @@ module coproc import custom_instr_pkg::*;
      .cntb_done_o (cntb_done_i)
      );
 
+  // interface to memory intercation fsm
+  if_rmem if_rmem_i(); 
   // hardware for stroing bits unaligned after decoding
   wbits wbits_i
     ( .clk_i (clk_i),
@@ -100,9 +98,22 @@ module coproc import custom_instr_pkg::*;
       .xif_issue (xif_issue),
       .xif_mem (xif_mem),
       .xif_mem_result (xif_mem_result),
-      .mem_needed_o (mem_needed_i),
+      .read_if (if_rmem_i),
+      .address_i (rs0_DP),
+      .inc_addr_o (inc_addr_i),
+      .offset (rs1_DP),
+      .rd_o (rd_wbits_i),
+      .rd_i (rd_DP),
       .done_o (wbits_done_i)
      );
+
+ 
+  read_mem read_mem_i ( .clk_i (clk_i),
+                        .rst_ni (rst_ni),
+                        .xif_mem (xif_mem),
+                        .xif_mem_result (xif_mem_result),
+                        .read_if (if_rmem_i));
+  
   
   
   // next_state logic
@@ -125,8 +136,6 @@ module coproc import custom_instr_pkg::*;
 
     instr_id_DN = instr_id_DP;
 
-    mem_valid_SN = mem_valid_SP;
-    data_read_DN = data_read_DP;
     cntb_start_o = 1'b0;
     wbits_start_o = 1'b0;
     
@@ -134,7 +143,6 @@ module coproc import custom_instr_pkg::*;
     unique case (state_SP)
       INIT: begin
         rd_DN = 32'd0;
-        mem_valid_SN = 1'b0;
         if (xif_issue.issue_valid) begin
           rs0_DN = xif_issue.issue_req.rs[0] ;
           rs1_DN = xif_issue.issue_req.rs[1];
@@ -152,7 +160,7 @@ module coproc import custom_instr_pkg::*;
             end
 
             OPCODE_WBITS: begin
-              state_SN = READ_MEM;
+              state_SN = WBITS;
               ld_op_SN = 1'b1;
               accept_SN = 1'b1;
               writeback_SN = 1'b1;
@@ -165,7 +173,7 @@ module coproc import custom_instr_pkg::*;
       CNTB: begin
         issue_ready_SN = 1'b0;
         cntb_start_o = 1'b1;
-        rd_DN = rd_DP + rd_i;
+        rd_DN = rd_DP + rd_cntb_i;
         if (cntb_done_i)//exec stage is done
           state_SN = WRITEBACK;
       end
@@ -174,25 +182,11 @@ module coproc import custom_instr_pkg::*;
       WBITS: begin
         issue_ready_SN = 1'b0;
         wbits_start_o = 1'b1;
-        if (wbits_done_i)
+        rd_DN = rd_DP | rd_wbits_i;
+        rs0_DN = rs0_DP + inc_addr_i; // to increase address by signals to read next signal
+        if (wbits_done_i) begin
           state_SN = WRITEBACK;
-      end
-
-      READ_MEM: begin
-        mem_valid_SN = 1'b1;
-        state_SN = WAIT_MEM_RESP;
-      end
-
-      WAIT_MEM_RESP: begin
-        if (xif_mem_result.mem_result_valid) begin
-          state_SN = WRITEBACK;
-          data_read_DN = xif_mem_result.mem_result.rdata;
         end
-          
-      end
-
-      WRITE_MEM: begin
-        
       end
 
       WRITEBACK: begin
@@ -238,12 +232,8 @@ module coproc import custom_instr_pkg::*;
   // sequential logic for read write memory
   always_ff @(posedge clk_i, negedge rst_ni) begin
     if (!rst_ni) begin
-      mem_valid_SP <= 1'b0;
-      data_read_DP <= 32'd0;
       instr_id_DP <= 1'b0;
     end else begin
-      mem_valid_SP <= mem_valid_SN;
-      data_read_DP <= data_read_DN;
       instr_id_DP <= instr_id_DN;
     end
       
