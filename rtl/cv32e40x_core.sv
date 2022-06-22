@@ -735,7 +735,7 @@ module cv32e40x_core import cv32e40x_pkg::*;
     .pc_if_i                    ( pc_if                  ),
     .ptr_in_if_i                ( ptr_in_if              ),
 
-   // custom csrs
+   // custom csrsn
    .samples_csr_o (samples_csr_o),
    .signals_csr_o (signals_csr_o)
   );
