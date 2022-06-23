@@ -30,8 +30,10 @@
 
 ${DESIGN_RTL_DIR}/include/cv32e40x_pkg.sv
 ${DESIGN_RTL_DIR}/include/custom_instr_pkg.sv
+// jtag packages
 ${DESIGN_RTL_DIR}/jtag_dbg/dm_pkg.sv
 ${DESIGN_RTL_DIR}/jtag_dbg/dm_memory_map_pkg.sv
+${DESIGN_RTL_DIR}/common_pulp_cells/cdc_reset_ctrlr_pkg.sv 
 ${DESIGN_RTL_DIR}/if_c_obi.sv
 ${DESIGN_RTL_DIR}/if_xif.sv
 ${DESIGN_RTL_DIR}/../bhv/include/cv32e40x_rvfi_pkg.sv
@@ -75,7 +77,10 @@ ${DESIGN_RTL_DIR}/cv32e40x_mpu.sv
 ${DESIGN_RTL_DIR}/cv32e40x_pma.sv
 ${DESIGN_RTL_DIR}/cv32e40x_pc_target.sv
 ${DESIGN_RTL_DIR}/count_bits.sv
+// pulp common cells used for jtag and jtag files
+${DESIGN_RTL_DIR}/common_pulp_cells/*
 ${DESIGN_RTL_DIR}/jtag_dbg/*
+  
 ${DESIGN_RTL_DIR}/if_rmem.sv 
 ${DESIGN_RTL_DIR}/read_mem.sv  
 ${DESIGN_RTL_DIR}/cntb.sv
