@@ -24,7 +24,7 @@ module cv32e40x_clock_gate
   );
 
   logic clk_en;
-
+/*
   always_latch
   begin
      if (clk_i == 1'b0)
@@ -32,5 +32,8 @@ module cv32e40x_clock_gate
   end
 
   assign clk_o = clk_i & clk_en;
+ */
+
+  assign clk_o = clk_i;
 
 endmodule // cv32e40x_clock_gate
