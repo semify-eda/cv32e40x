@@ -22,8 +22,8 @@ module boot_rom (
 
     logic [RomSize-1:0][31:0] mem;
     assign mem = {
-        dm_tb_pkg::jalr(5'h0, 5'h1, entry_addr[11:0]),
-        dm_tb_pkg::lui(5'h1, entry_addr[31:12])
+        dm_memory_map_pkg::jalr(5'h0, 5'h1, entry_addr[11:0]),
+        dm_memory_map_pkg::lui(5'h1, entry_addr[31:12])
     };
 
   logic [$clog2(RomSize)-1:0]     addr_q;

@@ -26,7 +26,8 @@ package dm_memory_map_pkg;
         HWPE_BASE     = 32'h1A10_C000,
         STDOUT_BASE   = 32'h1A10_F000,
         DEBUG_BASE    = 32'h1A11_0000,
-        SRAM_BASE     = 32'h0000_0000
+        SRAM_BASE     = 32'h0000_0000,
+        UART_BASE     = 32'h1A33_0000
                         
    } mmap_base_t;
 
@@ -42,6 +43,7 @@ package dm_memory_map_pkg;
     localparam logic [31:0] STDOUT_LEN   = 32'h0000_1000;
     localparam logic [31:0] DEBUG_LEN    = 32'h0000_1000;
     localparam logic [31:0] SRAM_LEN     = 32'h0040_0000;
+    localparam logic [31:0] UART_LEN     = 32'h0000_0010;
 
     // helper functions
     function automatic logic [31:0] jal (logic[4:0] rd, logic [20:0] imm);

@@ -944,6 +944,7 @@ typedef struct packed {
   logic [1:0]                  memtype;
   logic [2:0]                  prot;
   logic                        dbg;
+  logic                        we;
 } obi_inst_req_t;
 
 typedef struct packed {
@@ -987,7 +988,8 @@ parameter obi_inst_req_t OBI_INST_REQ_RESET_VAL = '{
   addr    : 'h0,
   memtype : 'h0,
   prot    : {PRIV_LVL_M, 1'b0},
-  dbg     : 1'b0
+  dbg     : 1'b0,
+  we : 1'b0
 };
 
 // Data transfer bundeled with MPU status

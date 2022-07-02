@@ -80,6 +80,9 @@ ${DESIGN_RTL_DIR}/count_bits.sv
 // pulp common cells used for jtag and jtag files
 ${DESIGN_RTL_DIR}/common_pulp_cells/*
 ${DESIGN_RTL_DIR}/jtag_dbg/*
+
+  //UART
+${DESIGN_RTL_DIR}/uart/uart.sv
   
 ${DESIGN_RTL_DIR}/if_rmem.sv 
 ${DESIGN_RTL_DIR}/read_mem.sv  
