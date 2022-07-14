@@ -30,6 +30,8 @@ module coproc import custom_instr_pkg::*;
  
   logic                 writeback_SP, writeback_SN;
   logic                 accept_SP, accept_SN;
+  logic                 result_valid_SP, result_valid_SN;
+ 
 
 
   logic                 cntb_done_i, wbits_done_i;
@@ -72,8 +74,8 @@ module coproc import custom_instr_pkg::*;
   assign xif_result.result.exc = 0;
   assign xif_result.result.exccode = 0;
 
+  assign xif_result.result_valid = result_valid_SP;
   
-
   // hardware for cntb instruction
   cntb cntb_i
     (
@@ -84,7 +86,6 @@ module coproc import custom_instr_pkg::*;
      .rs1_i (rs1_DP),
      .rd_i (rd_DP),
      .start_i (cntb_start_o),
-     .xif_issue (xif_issue),
      .cntb_done_o (cntb_done_i)
      );
 
@@ -95,9 +96,6 @@ module coproc import custom_instr_pkg::*;
     ( .clk_i (clk_i),
       .rst_ni (rst_ni),
       .start_i (wbits_start_o),
-      .xif_issue (xif_issue),
-      .xif_mem (xif_mem),
-      .xif_mem_result (xif_mem_result),
       .read_if (if_rmem_i),
       .address_i (rs0_DP),
       .inc_addr_o (inc_addr_i),
@@ -110,16 +108,19 @@ module coproc import custom_instr_pkg::*;
  
   read_mem read_mem_i ( .clk_i (clk_i),
                         .rst_ni (rst_ni),
-                        .xif_mem (xif_mem),
-                        .xif_mem_result (xif_mem_result),
-                        .read_if (if_rmem_i));
+                        .read_if (if_rmem_i),
+                        .mem_req_last (xif_mem.mem_req.last),
+                        .mem_valid (xif_mem.mem_valid),
+                        .mem_result_valid (xif_mem_result.mem_result_valid),
+                        .mem_result_rdata (xif_mem_result.mem_result.rdata)
+                        );
   
   
   
   // next_state logic
   always_comb begin
     state_SN = state_SP;
-    xif_result.result_valid = 1'b0;
+    result_valid_SN = result_valid_SP;
 
     rs0_DN = rs0_DP;
     rs1_DN = rs1_DP;
@@ -143,6 +144,7 @@ module coproc import custom_instr_pkg::*;
     unique case (state_SP)
       INIT: begin
         rd_DN = 32'd0;
+        result_valid_SN = 1'b0;
         if (xif_issue.issue_valid) begin
           rs0_DN = xif_issue.issue_req.rs[0] ;
           rs1_DN = xif_issue.issue_req.rs[1];
@@ -190,7 +192,7 @@ module coproc import custom_instr_pkg::*;
       end
 
       WRITEBACK: begin
-        xif_result.result_valid = 1'b1;
+        result_valid_SN = 1'b1;
         if (xif_result.result_ready)
           state_SN = INIT;
       end
@@ -212,6 +214,7 @@ module coproc import custom_instr_pkg::*;
       writeback_SP <= 0;
       accept_SP <= 0;
       rd_DP <= 0;
+      result_valid_SP <= 1'b0;
     end else begin
       state_SP <= state_SN;
       ld_op_SP <= ld_op_SN;
@@ -225,7 +228,7 @@ module coproc import custom_instr_pkg::*;
       accept_SP <= accept_SN;
       
       rd_DP <= rd_DN;
-      
+      result_valid_SP <= result_valid_SN;
     end
   end // always_ff @ (posedge clk_i, negedge rst_ni)
 

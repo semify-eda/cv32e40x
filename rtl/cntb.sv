@@ -7,7 +7,6 @@ module cntb import custom_instr_pkg::*;
     input logic [31:0]  rs0_i,
     input logic [31:0]  rs1_i,
     output logic [31:0] rd_o,
-                        if_xif.coproc_issue xif_issue,
     output logic        cntb_done_o
    );    
 

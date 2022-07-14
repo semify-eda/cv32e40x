@@ -1,8 +1,10 @@
 module read_mem (input logic clk_i,
-                 input logic         rst_ni,
-                 if_xif.coproc_mem xif_mem,
-                 if_xif.coproc_mem_result xif_mem_result,
-                 if_rmem.read_mod read_if               
+                 input logic rst_ni,
+                             if_rmem.read_mod read_if,
+                 output      mem_req_last,
+                 output      mem_valid,
+                 input       mem_result_valid,
+                 input [31:0]      mem_result_rdata              
                  );
 
   enum logic [1:0] {INIT, READ_MEM, WAIT_MEM_RESP, DONE} state_SN, state_SP;
@@ -10,8 +12,8 @@ module read_mem (input logic clk_i,
   logic   mem_valid_SN, mem_valid_SP, last_SN, last_SP;
   logic [31:0]          data_read_DN, data_read_DP;
 
-  assign xif_mem.mem_req.last = 1'b0;
-  assign xif_mem.mem_valid = mem_valid_SP;
+  assign mem_req_last = 1'b0;
+  assign mem_valid = mem_valid_SP;
   assign read_if.rdata = data_read_DP;
   
   
@@ -37,9 +39,9 @@ module read_mem (input logic clk_i,
 
       
       WAIT_MEM_RESP: begin
-        if (xif_mem_result.mem_result_valid) begin
+        if (mem_result_valid) begin
           state_SN = DONE;
-          data_read_DN = xif_mem_result.mem_result.rdata;
+          data_read_DN = mem_result_rdata;
           mem_valid_SN = 1'b0;
         end
           

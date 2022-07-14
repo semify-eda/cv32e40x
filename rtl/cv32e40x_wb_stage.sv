@@ -126,7 +126,7 @@ module cv32e40x_wb_stage import cv32e40x_pkg::*;
   //////////////////////////////////////////////////////////////////////////////
   // Stage ready/valid
 
-  assign wb_ready_o = ctrl_fsm_i.kill_wb || (lsu_ready_i && !xif_waiting && !ctrl_fsm_i.halt_wb);
+  assign wb_ready_o = ctrl_fsm_i.kill_wb || (lsu_ready_i && !xif_waiting);
 
   // wb_valid
   //

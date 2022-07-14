@@ -1,4 +1,4 @@
-module simpleuart (
+module uart (
 	clk,
 	resetn,
 	ser_tx,
@@ -12,8 +12,8 @@ module simpleuart (
 	reg_dat_do,
 	reg_dat_wait
 );
-	// Trace: /home/mario/uni/sem10/bachelorarbeit/gitclone/semify_brle/core-v-verif/core-v-cores/cv32e40x/rtl/uart/uart.sv:20:31
-	parameter integer DEFAULT_DIV = 1;
+	// Trace: /home/mario/uni/sem10/bachelorarbeit/gitclone/semify_brle/core-v-verif/core-v-cores/cv32e40x/rtl/uart/uart.sv:20:25
+	parameter integer DEFAULT_DIV = 218;
 	// Trace: /home/mario/uni/sem10/bachelorarbeit/gitclone/semify_brle/core-v-verif/core-v-cores/cv32e40x/rtl/uart/uart.sv:21:2
 	input clk;
 	// Trace: /home/mario/uni/sem10/bachelorarbeit/gitclone/semify_brle/core-v-verif/core-v-cores/cv32e40x/rtl/uart/uart.sv:22:2

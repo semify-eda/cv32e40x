@@ -3,10 +3,7 @@ module wbits import custom_instr_pkg::*;
    input logic         clk_i,
    input logic         rst_ni,
    input logic         start_i,
-                       if_xif.coproc_issue xif_issue,
-                       if_xif.coproc_mem xif_mem,
-                       if_xif.coproc_mem_result xif_mem_result,
-                       if_rmem.read_coproc read_if,
+   if_rmem.read_coproc read_if,
    input logic [31:0]  address_i, //rs0
    output logic [31:0] inc_addr_o,
    input logic [31:0]  offset, // rs1
@@ -21,13 +18,12 @@ module wbits import custom_instr_pkg::*;
 
   logic                             start_read_SP, start_read_SN;
 
-  logic [3:0][31:0]                      shift_4_sigs_o;
-  logic [4:0]                            curr_signal_SP, curr_signal_SN; // stores which signal we currently read
+  logic [3:0][31:0]                 shift_4_sigs_o;
+  logic [4:0]                       curr_signal_SP, curr_signal_SN; // stores which signal we currently read
   
   
 
-  assign read_if.addr = address_i;
-
+  //assign read_if.addr = address_i;
   
   integer                           i;
 
