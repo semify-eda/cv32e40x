@@ -28,7 +28,9 @@ package dm_memory_map_pkg;
         DEBUG_BASE    = 32'h1A11_0000,
         SRAM_BASE     = 32'h0000_0000,
         UART_BASE     = 32'h1A33_0000,
-        UART_WAIT_STATUS = 32'h1A44_0000
+        UART_WAIT_STATUS = 32'h1A44_0000,
+        JD_OUTPUT = 32'h1A44_0004
+                               
                         
    } mmap_base_t;
 

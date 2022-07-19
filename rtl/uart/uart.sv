@@ -17,7 +17,7 @@
  *
  */
 
-module uart #(parameter integer DEFAULT_DIV = 218) (
+module uart #(parameter integer DEFAULT_DIV = 651) (
 	input clk,
 	input resetn,
 
