@@ -71,7 +71,7 @@ module cntb import custom_instr_pkg::*;
               state_SN = EXEC;
             end else begin
               state_SN = DONE;
-            end
+            end 
           end
           else if (result_cntb[1] == top_bits_set[1]>>right_shift_DP  && (right_shift_DP < 26))
             rd_o = 32'd7;
@@ -85,8 +85,10 @@ module cntb import custom_instr_pkg::*;
             rd_o = 32'd3;
           else if (result_cntb[6] == top_bits_set[6]>>right_shift_DP  && (right_shift_DP < 31))
             rd_o = 32'd2;
-          else
+          else if (right_shift_DP < 32)
             rd_o = 32'd1;    
+          else    
+            rd_o = 32'd0;
         end else if (rs0_i[rs1_i] == 1'b0) begin // if (rs0_i[rs1_i] == 1'b1)
           // count consecutive 0 bits
           if (result_cntb[0] == 32'd0 && (right_shift_DP < 25)) begin
@@ -110,8 +112,10 @@ module cntb import custom_instr_pkg::*;
             rd_o = 32'd3;
           else if (result_cntb[6] == 32'd0 && (right_shift_DP < 31))
             rd_o = 32'd2;
-          else
+          else if (right_shift_DP < 32)
             rd_o = 32'd1; 
+          else
+            rd_o = 32'd0; 
         end // if (rs0_i[rs1_i] == 1'b0)
         
       end // case: EXEC
