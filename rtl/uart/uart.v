@@ -13,7 +13,7 @@ module uart (
 	reg_dat_wait
 );
 	// Trace: /home/mario/uni/sem10/bachelorarbeit/gitclone/semify_brle/core-v-verif/core-v-cores/cv32e40x/rtl/uart/uart.sv:20:25
-	parameter integer DEFAULT_DIV = 218;
+	parameter integer DEFAULT_DIV = 608;
 	// Trace: /home/mario/uni/sem10/bachelorarbeit/gitclone/semify_brle/core-v-verif/core-v-cores/cv32e40x/rtl/uart/uart.sv:21:2
 	input clk;
 	// Trace: /home/mario/uni/sem10/bachelorarbeit/gitclone/semify_brle/core-v-verif/core-v-cores/cv32e40x/rtl/uart/uart.sv:22:2
@@ -61,7 +61,7 @@ module uart (
 	// Trace: /home/mario/uni/sem10/bachelorarbeit/gitclone/semify_brle/core-v-verif/core-v-cores/cv32e40x/rtl/uart/uart.sv:50:2
 	assign reg_div_do = cfg_divider;
 	// Trace: /home/mario/uni/sem10/bachelorarbeit/gitclone/semify_brle/core-v-verif/core-v-cores/cv32e40x/rtl/uart/uart.sv:52:2
-	assign reg_dat_wait = reg_dat_we && (send_bitcnt || send_dummy);
+	assign reg_dat_wait = send_bitcnt || send_dummy;
 	// Trace: /home/mario/uni/sem10/bachelorarbeit/gitclone/semify_brle/core-v-verif/core-v-cores/cv32e40x/rtl/uart/uart.sv:53:2
 	assign reg_dat_do = (recv_buf_valid ? recv_buf_data : ~0);
 	// Trace: /home/mario/uni/sem10/bachelorarbeit/gitclone/semify_brle/core-v-verif/core-v-cores/cv32e40x/rtl/uart/uart.sv:55:2
