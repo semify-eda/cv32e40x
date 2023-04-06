@@ -171,13 +171,8 @@ module cv32e40x_align_check import cv32e40x_pkg::*;
   // Signal ready towards core
   assign core_trans_ready_o     = (bus_trans_ready_i && !align_block_core) || align_trans_ready;
 
-  generate
-    if (IF_STAGE) begin: alcheck_if
-      assign core_trans_we = 1'b0;
-    end
-    else begin: alcheck_lsu
-      assign core_trans_we = core_trans_i.we;
-    end
-  endgenerate
+
+  assign core_trans_we = 1'b0;
+
 
 endmodule

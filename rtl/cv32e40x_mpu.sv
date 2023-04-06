@@ -209,21 +209,10 @@ module cv32e40x_mpu import cv32e40x_pkg::*;
 
   assign mpu_err = pma_err;
 
-  // Writes are only supported on the data interface
-  // Tie to 1'b0 if this MPU is instantiatied in the IF stage
-  generate
-    if (IF_STAGE) begin: mpu_if
-      assign instr_fetch_access = 1'b1;
-      assign load_access        = 1'b0;
-      assign core_trans_we      = 1'b0;
-    end
-    else begin: mpu_lsu
-      assign instr_fetch_access    = 1'b0;
-      assign load_access           = !core_trans_i.we;
-      assign core_trans_we         = core_trans_i.we;
-      assign core_resp_o.wpt_match = 1'b0; // Will be set by upstream wpt-module within load_store_unit
-    end
-  endgenerate
+  assign instr_fetch_access = 1'b1;
+  assign load_access        = 1'b0;
+  assign core_trans_we      = 1'b0;
+
 
 // TODO:OE any way to check that the 2nd access of a failed misalgn will not reach the MPU?
 
