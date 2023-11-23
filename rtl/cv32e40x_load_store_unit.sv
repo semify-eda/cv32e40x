@@ -788,7 +788,7 @@ module cv32e40x_load_store_unit import cv32e40x_pkg::*;
   //////////////////////////////////////////////////////////////////////////////
   assign mpu_trans_atomic = mpu_trans.atop[5];
 
-  cv32e40x_mpu
+  cv32e40x_mpu2
   #(
     .IF_STAGE           ( 0                    ),
     .A_EXT              ( A_EXT                ),
